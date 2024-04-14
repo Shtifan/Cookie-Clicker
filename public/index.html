@@ -4,37 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Cookie Clicker</title>
-        <style>
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }
-            .cookie-container {
-                position: relative;
-            }
-            .cookie-count {
-                position: absolute;
-                top: -30px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: #fff;
-                padding: 5px 10px;
-                border: 1px solid #000;
-                border-radius: 5px;
-            }
-            .cookie-image {
-                cursor: default; /* Set default cursor */
-                width: 400px; /* Adjust the width as desired */
-                height: auto; /* Maintain aspect ratio */
-                transition: transform 0.1s; /* Add smooth transition */
-            }
-            .cookie-clicked {
-                transform: scale(0.9); /* Make it smaller when clicked */
-            }
-        </style>
+        <link rel="stylesheet" href="style.css" />
     </head>
     <body>
         <div class="cookie-container">
@@ -42,72 +12,33 @@
             <img src="cookie.png" id="cookie-img" class="cookie-image" />
         </div>
 
-        <script>
-            let clickCount = 0;
-            const cookieImg = document.getElementById("cookie-img");
-            const clickCountElement = document.getElementById("click-count");
-
-            cookieImg.addEventListener("mousemove", function (event) {
-                // Get the coordinates of the mouse pointer relative to the image
-                const rect = cookieImg.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-
-                // Get the pixel color at the mouse pointer
-                const canvas = document.createElement("canvas");
-                const context = canvas.getContext("2d");
-                canvas.width = cookieImg.width;
-                canvas.height = cookieImg.height;
-                context.drawImage(cookieImg, 0, 0, canvas.width, canvas.height);
-                const pixel = context.getImageData(x, y, 1, 1).data;
-
-                // Check if the pixel is transparent
-                const isTransparent = pixel[3] === 0;
-
-                // Change cursor style based on transparency
-                if (isTransparent) {
-                    cookieImg.style.cursor = "default"; // Change cursor to default
-                } else {
-                    cookieImg.style.cursor = "pointer"; // Change cursor to pointer
-                }
-            });
-
-            cookieImg.addEventListener("mousedown", function (event) {
-                // Get the coordinates of the click relative to the image
-                const rect = cookieImg.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-
-                // Get the pixel color at the clicked point
-                const canvas = document.createElement("canvas");
-                const context = canvas.getContext("2d");
-                canvas.width = cookieImg.width;
-                canvas.height = cookieImg.height;
-                context.drawImage(cookieImg, 0, 0, canvas.width, canvas.height);
-                const pixel = context.getImageData(x, y, 1, 1).data;
-
-                // Check if the pixel is transparent
-                const isTransparent = pixel[3] === 0;
-
-                if (!isTransparent) {
-                    // If not transparent, count as a click
-                    // Make the image smaller when clicked
-                    cookieImg.classList.add("cookie-clicked");
-
-                    // Increment click count
-                    clickCount++;
-                    clickCountElement.innerText = clickCount;
-                }
-            });
-
-            cookieImg.addEventListener("mouseup", function () {
-                // Restore the image size when mouse button is released
-                cookieImg.classList.remove("cookie-clicked");
-            });
-        </script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
             const socket = io();
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const socket = io();
+
+                // Get references to the image and click count elements
+                const cookieImg = document.getElementById("cookie-img");
+                const clickCountElement = document.getElementById("click-count");
+
+                // Listen for initial click count from server
+                socket.on("initialClickCount", (clickCount) => {
+                    clickCountElement.innerText = clickCount;
+                });
+
+                // Listen for click event from server
+                socket.on("updateClickCount", (clickCount) => {
+                    clickCountElement.innerText = clickCount;
+                });
+
+                // Add click event listener to the image
+                cookieImg.addEventListener("click", function () {
+                    // Send click event to server
+                    socket.emit("click");
+                });
+            });
         </script>
     </body>
 </html>

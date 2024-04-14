@@ -1,0 +1,29 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.cookie-container {
+    position: relative;
+}
+.cookie-count {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    padding: 5px 10px;
+    border: 1px solid #000;
+    border-radius: 5px;
+}
+.cookie-image {
+    cursor: default; /* Set default cursor */
+    width: 400px; /* Adjust the width as desired */
+    height: auto; /* Maintain aspect ratio */
+    transition: transform 0.1s; /* Add smooth transition */
+}
+.cookie-clicked {
+    transform: scale(0.9); /* Make it smaller when clicked */
+}
