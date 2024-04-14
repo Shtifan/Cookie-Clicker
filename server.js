@@ -32,7 +32,7 @@ io.on("connection", (socket) => {
                 console.error("Error reading click count file:", err);
                 return;
             }
-            let clickCount = parseInt(data) || 0;
+            let clickCount = parseInt(data);
             clickCount++;
             fs.writeFile("data.txt", clickCount.toString(), (err) => {
                 if (err) {

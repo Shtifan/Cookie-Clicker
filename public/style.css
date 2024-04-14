@@ -5,9 +5,11 @@ body {
     height: 100vh;
     margin: 0;
 }
+
 .cookie-container {
     position: relative;
 }
+
 .cookie-count {
     position: absolute;
     top: -30px;
@@ -18,12 +20,16 @@ body {
     border: 1px solid #000;
     border-radius: 5px;
 }
+
 .cookie-image {
+    user-select: none;
+    outline: none;
     cursor: default; /* Set default cursor */
     width: 400px; /* Adjust the width as desired */
     height: auto; /* Maintain aspect ratio */
     transition: transform 0.1s; /* Add smooth transition */
 }
+
 .cookie-clicked {
-    transform: scale(0.9); /* Make it smaller when clicked */
+    transform: scale(0.95); /* Make it smaller when clicked */
 }

@@ -1,11 +1,9 @@
 const socket = io();
 
 document.addEventListener("DOMContentLoaded", function () {
-    const socket = io();
-
-    // Get references to the image and click count elements
-    const cookieImg = document.getElementById("cookie-img");
+    // Get references to the click count element and the document
     const clickCountElement = document.getElementById("click-count");
+    const doc = document.documentElement;
 
     // Listen for initial click count from server
     socket.on("initialClickCount", (clickCount) => {
@@ -17,9 +15,21 @@ document.addEventListener("DOMContentLoaded", function () {
         clickCountElement.innerText = clickCount;
     });
 
-    // Add click event listener to the image
-    cookieImg.addEventListener("click", function () {
+    // Add click event listener to the entire document
+    doc.addEventListener("click", function () {
         // Send click event to server
         socket.emit("click");
     });
+
+    // Function to animate the cookie
+    function animateCookie() {
+        const cookieImg = document.getElementById("cookie-img");
+        cookieImg.classList.add("cookie-clicked");
+        setTimeout(() => {
+            cookieImg.classList.remove("cookie-clicked");
+        }, 100);
+    }
+
+    // Listen for click event on the document and animate the cookie
+    doc.addEventListener("click", animateCookie);
 });
