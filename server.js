@@ -1,56 +1,37 @@
 const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
-const fs = require("fs");
-
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const http = require("http").createServer(app);
+const io = require("socket.io")(http, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+    },
+});
 
-// Serve static files from the 'public' directory
-app.use(express.static("public"));
+app.use(express.static("./"));
 
-// Handle socket connections
+let playerCount = 0;
+let totalCookies = 0;
+
 io.on("connection", (socket) => {
-    console.log("A user connected");
+    playerCount++;
+    io.emit("player-count", playerCount);
+    // Send current cookie count to newly connected user
+    socket.emit("cookie-count", totalCookies);
 
-    // Load initial click count from file
-    fs.readFile("data.txt", "utf8", (err, data) => {
-        if (err) {
-            console.error("Error reading click count file:", err);
-            socket.emit("initialClickCount", 0);
-        } else {
-            const initialClickCount = parseInt(data) || 0;
-            socket.emit("initialClickCount", initialClickCount);
-        }
-    });
-
-    // Handle click event
-    socket.on("click", () => {
-        fs.readFile("data.txt", "utf8", (err, data) => {
-            if (err) {
-                console.error("Error reading click count file:", err);
-                return;
-            }
-            let clickCount = parseInt(data);
-            clickCount++;
-            fs.writeFile("data.txt", clickCount.toString(), (err) => {
-                if (err) {
-                    console.error("Error writing click count file:", err);
-                } else {
-                    // Broadcast updated click count to all clients
-                    io.emit("updateClickCount", clickCount);
-                }
-            });
-        });
+    socket.on("cookie-clicked", () => {
+        totalCookies++;
+        // Broadcast the new total to all connected clients
+        io.emit("cookie-count", totalCookies);
     });
 
     socket.on("disconnect", () => {
-        console.log("User disconnected");
+        playerCount--;
+        io.emit("player-count", playerCount);
     });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+http.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });

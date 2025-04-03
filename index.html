@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Cookie Clicker</h1>
+        <div class="cookie-container">
+            <img src="cookie.png" alt="Cookie" id="cookie" class="cookie">
+        </div>
+        <div class="counter-container">
+            <p>Cookies: <span id="counter">0</span></p>
+            <p>Players Online: <span id="playerCount">0</span></p>
+        </div>
+    </div>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html> 
