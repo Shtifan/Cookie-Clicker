@@ -14,41 +14,72 @@ app.use(express.static("./"));
 
 let playerCount = 0;
 let totalCookies = 0;
+let upgrades = {
+    clickPower: 1,
+    autoClicker: 0,
+    autoClickerCost: 100,
+    clickPowerCost: 50,
+};
 
-// Load cookie count from file
-const cookieFile = path.join(__dirname, "cookies.dat");
+// Load game state from file
+const gameStateFile = path.join(__dirname, "cookies.txt");
 try {
-    if (fs.existsSync(cookieFile)) {
-        const data = fs.readFileSync(cookieFile, "utf8");
-        totalCookies = parseInt(data) || 0;
-        console.log(`Loaded ${totalCookies} cookies from file`);
+    if (fs.existsSync(gameStateFile)) {
+        const data = JSON.parse(fs.readFileSync(gameStateFile, "utf8"));
+        totalCookies = data.cookies || 0;
+        upgrades = data.upgrades || upgrades;
+        console.log(`Loaded game state from file`);
     }
 } catch (err) {
-    console.error("Error loading cookie count:", err);
+    console.error("Error loading game state:", err);
 }
 
-// Function to save cookie count
-const saveCookieCount = () => {
+// Function to save game state
+const saveGameState = () => {
     try {
-        fs.writeFileSync(cookieFile, totalCookies.toString());
-        console.log(`Saved ${totalCookies} cookies to file`);
+        const gameState = {
+            cookies: totalCookies,
+            upgrades: upgrades,
+        };
+        fs.writeFileSync(gameStateFile, JSON.stringify(gameState));
+        console.log(`Saved game state to file`);
     } catch (err) {
-        console.error("Error saving cookie count:", err);
+        console.error("Error saving game state:", err);
     }
 };
 
 io.on("connection", (socket) => {
     playerCount++;
     io.emit("player-count", playerCount);
-    // Send current cookie count to newly connected user
-    socket.emit("cookie-count", totalCookies);
+    // Send current game state to newly connected user
+    socket.emit("game-state", { cookies: totalCookies, upgrades: upgrades });
 
     socket.on("cookie-clicked", () => {
-        totalCookies++;
+        totalCookies += upgrades.clickPower;
         // Broadcast the new total to all connected clients
         io.emit("cookie-count", totalCookies);
-        // Save the new count to file
-        saveCookieCount();
+        // Save the new state to file
+        saveGameState();
+    });
+
+    socket.on("buy-upgrade", (type) => {
+        let canBuy = false;
+        if (type === "clickPower" && totalCookies >= upgrades.clickPowerCost) {
+            totalCookies -= upgrades.clickPowerCost;
+            upgrades.clickPower *= 2;
+            upgrades.clickPowerCost *= 2;
+            canBuy = true;
+        } else if (type === "autoClicker" && totalCookies >= upgrades.autoClickerCost) {
+            totalCookies -= upgrades.autoClickerCost;
+            upgrades.autoClicker++;
+            upgrades.autoClickerCost = Math.floor(upgrades.autoClickerCost * 1.5);
+            canBuy = true;
+        }
+
+        if (canBuy) {
+            io.emit("game-state", { cookies: totalCookies, upgrades: upgrades });
+            saveGameState();
+        }
     });
 
     socket.on("disconnect", () => {
@@ -56,6 +87,15 @@ io.on("connection", (socket) => {
         io.emit("player-count", playerCount);
     });
 });
+
+// Auto-clicker logic
+setInterval(() => {
+    if (upgrades.autoClicker > 0) {
+        totalCookies += upgrades.autoClicker * upgrades.clickPower;
+        io.emit("cookie-count", totalCookies);
+        saveGameState();
+    }
+}, 1000);
 
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {

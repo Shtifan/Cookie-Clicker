@@ -1,23 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cookie Clicker</title>
     <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div class="game-container">
+    <div class="container">
         <h1>Cookie Clicker</h1>
-        <div class="cookie-container">
-            <img src="cookie.png" alt="Cookie" id="cookie" class="cookie">
+        
+        <div class="stats">
+            <div class="stat">
+                <p>Players Online: <span id="playerCount">0</span></p>
+            </div>
+            <div class="stat">
+                <p>Cookies: <span id="counter">0</span></p>
+            </div>
         </div>
-        <div class="counter-container">
-            <p>Cookies: <span id="counter">0</span></p>
-            <p>Players Online: <span id="playerCount">0</span></p>
+
+        <img id="cookie" src="cookie.png" alt="Cookie">
+        
+        <div class="upgrades">
+            <div class="upgrade">
+                <h3>Click Power</h3>
+                <p>Level: <span id="clickPowerLevel">1</span></p>
+                <p>Cost: <span id="clickPowerCost">50</span> cookies</p>
+                <button id="clickPowerBtn">Buy Click Power</button>
+            </div>
+            
+            <div class="upgrade">
+                <h3>Auto Clicker</h3>
+                <p>Level: <span id="autoClickerLevel">0</span></p>
+                <p>Cost: <span id="autoClickerCost">100</span> cookies</p>
+                <button id="autoClickerBtn">Buy Auto Clicker</button>
+            </div>
         </div>
     </div>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    
+    <script src="/socket.io/socket.io.js"></script>
     <script src="game.js"></script>
 </body>
 </html> 
