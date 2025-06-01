@@ -1,1 +1,0 @@
-{"cookies":69674336788,"upgrades":{"clickPower":33554432,"autoClicker":46,"autoClickerCost":12542057974,"clickPowerCost":1677721600}}
