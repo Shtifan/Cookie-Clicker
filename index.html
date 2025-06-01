@@ -1,43 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Cookie Clicker</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Cookie Clicker</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #cookie {
+            cursor: pointer;
+            transition: transform 0.1s;
+            width: 200px;
+            height: 200px;
+        }
+        #cookie:active {
+            transform: scale(0.95);
+        }
+        #counter {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Cookie Clicker</h1>
-        
-        <div class="stats">
-            <div class="stat">
-                <p>Players Online: <span id="playerCount">0</span></p>
-            </div>
-            <div class="stat">
-                <p>Cookies: <span id="counter">0</span></p>
-            </div>
-        </div>
+    <div id="counter">Total Clicks: 0</div>
+    <img src="cookie.png" id="cookie" alt="Cookie">
 
-        <img id="cookie" src="cookie.png" alt="Cookie">
-        
-        <div class="upgrades">
-            <div class="upgrade">
-                <h3>Click Power</h3>
-                <p>Level: <span id="clickPowerLevel">1</span></p>
-                <p>Cost: <span id="clickPowerCost">50</span> cookies</p>
-                <button id="clickPowerBtn">Buy Click Power</button>
-            </div>
-            
-            <div class="upgrade">
-                <h3>Auto Clicker</h3>
-                <p>Level: <span id="autoClickerLevel">0</span></p>
-                <p>Cost: <span id="autoClickerCost">100</span> cookies</p>
-                <button id="autoClickerBtn">Buy Auto Clicker</button>
-            </div>
-        </div>
-    </div>
-    
     <script src="/socket.io/socket.io.js"></script>
-    <script src="game.js"></script>
+    <script>
+        const socket = io();
+        const cookie = document.getElementById('cookie');
+        const counter = document.getElementById('counter');
+
+        cookie.addEventListener('click', () => {
+            socket.emit('cookieClick');
+        });
+
+        socket.on('updateCount', (count) => {
+            counter.textContent = `Total Clicks: ${count}`;
+        });
+    </script>
 </body>
-</html> 
+</html>
